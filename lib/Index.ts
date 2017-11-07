@@ -79,13 +79,13 @@ export const connectToJwt = async (host: string) => {
          * @param password - user's password used to login
          * @throws {CannotAuthenticate}
          */
-        generateToken: generateToken.bind(null, host),
+        generateToken: generateToken.bind(null, host) as (username: string, password: string) => Promise<JWT>,
 
         /**
          * Validate token
          * @param token - token to validate
          * @returns true if token is successfully validated
          */
-        validateToken: validateToken.bind(null, host),
+        validateToken: validateToken.bind(null, host) as (token: string) => boolean,
     };
 };
