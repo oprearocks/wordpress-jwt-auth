@@ -1,3 +1,4 @@
+import { OPTIONS } from './Defaults';
 /**
  * JWT Response after successfully authenticated user
  */
@@ -19,6 +20,7 @@ export interface JWT {
      */
     user_display_name: string;
 }
+export declare const configure: (options: OPTIONS) => void;
 /**
  * Authenticate user
  * @param host - host URL
