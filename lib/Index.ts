@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const JWT_ENDPOINT = '/wp-json/jwt-auth/v1/';
+import defaults, { OPTIONS } from './Defaults';
 
 /**
  * JWT Response after successfully authenticated user
@@ -27,6 +26,12 @@ export interface JWT {
     user_display_name: string;
 }
 
+let CONFIG: OPTIONS = Object.assign({}, defaults);
+
+export const configure = (options: OPTIONS): void => {
+    CONFIG = Object.assign(CONFIG, options);
+}
+
 /**
  * Authenticate user
  * @param host - host URL
@@ -35,8 +40,8 @@ export interface JWT {
  * @throws {CannotAuthenticate}
  */
 export const generateToken = async (host: string, username: string, password: string): Promise<JWT> => {
-    const endPoint = host + JWT_ENDPOINT;
-    const response = await axios.post(endPoint + 'token', { username, password });
+    const generateTokenEndpoint = `${host}/${CONFIG.JWT_ENDPOINT}/${CONFIG.JWT_ROUTE_GENERATE}`;
+    const response = await axios.post(generateTokenEndpoint, { username, password });
     switch (response.status) {
         case 403: throw new Error('CannotAuthenticate: Bad username or password');
         case 404: throw new Error(`CannotAuthenticate: Page doesn\'t exists, make sure JWT is installed`);
@@ -52,9 +57,9 @@ export const generateToken = async (host: string, username: string, password: st
  * @returns true if token is successfully validated
  */
 export const validateToken = async (host: string, token: string): Promise<boolean> => {
-    const endPoint = host + JWT_ENDPOINT;
+    const validateTokenEndpoint = `${host}/${CONFIG.JWT_ENDPOINT}/${CONFIG.JWT_ROUTE_VALIDATE}`;
     const authHeader = { headers: { Authorization: 'bearer ' + token } };
-    const response = await axios.post(endPoint + 'validate', {}, authHeader);
+    const response = await axios.post(validateTokenEndpoint, {}, authHeader);
     if (response.status === 200) {
         return true;
     }
@@ -67,7 +72,8 @@ export const validateToken = async (host: string, token: string): Promise<boolea
  * @throws {CannotConnect}
  */
 export const connectToJwt = async (host: string) => {
-    const response = await axios.post(`${host}/${JWT_ENDPOINT}/token`);
+    const generateTokenEndpoint = `${host}/${CONFIG.JWT_ENDPOINT}/${CONFIG.JWT_ROUTE_GENERATE}`;
+    const response = await axios.post(generateTokenEndpoint);
     if (response.status === 404) {
         throw new Error('CannotConnect: bad host or JWT is not installed');
     }
