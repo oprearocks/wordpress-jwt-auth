@@ -1,4 +1,12 @@
 "use strict";
+var __assign = (this && this.__assign) || Object.assign || function(t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+            t[p] = s[p];
+    }
+    return t;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -55,7 +63,9 @@ exports.generateToken = function (host, username, password) { return __awaiter(_
         switch (_a.label) {
             case 0:
                 generateTokenEndpoint = host + "/" + CONFIG.JWT_ENDPOINT + "/" + CONFIG.JWT_ROUTE_GENERATE;
-                return [4 /*yield*/, axios_1.default.post(generateTokenEndpoint, { username: username, password: password })];
+                return [4 /*yield*/, axios_1.default.post(generateTokenEndpoint, { username: username, password: password }, {
+                        headers: __assign({}, CONFIG.HEADERS),
+                    })];
             case 1:
                 response = _a.sent();
                 switch (response.status) {
@@ -73,13 +83,13 @@ exports.generateToken = function (host, username, password) { return __awaiter(_
  * @returns true if token is successfully validated
  */
 exports.validateToken = function (host, token) { return __awaiter(_this, void 0, void 0, function () {
-    var validateTokenEndpoint, authHeader, response;
+    var validateTokenEndpoint, headers, response;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 validateTokenEndpoint = host + "/" + CONFIG.JWT_ENDPOINT + "/" + CONFIG.JWT_ROUTE_VALIDATE;
-                authHeader = { headers: { Authorization: 'bearer ' + token } };
-                return [4 /*yield*/, axios_1.default.post(validateTokenEndpoint, {}, authHeader)];
+                headers = { headers: __assign({ Authorization: 'Bearer ' + token }, CONFIG.HEADERS) };
+                return [4 /*yield*/, axios_1.default.post(validateTokenEndpoint, {}, headers)];
             case 1:
                 response = _a.sent();
                 if (response.status === 200) {
@@ -100,7 +110,9 @@ exports.connectToJwt = function (host) { return __awaiter(_this, void 0, void 0,
         switch (_a.label) {
             case 0:
                 generateTokenEndpoint = host + "/" + CONFIG.JWT_ENDPOINT + "/" + CONFIG.JWT_ROUTE_GENERATE;
-                return [4 /*yield*/, axios_1.default.post(generateTokenEndpoint)];
+                return [4 /*yield*/, axios_1.default.post(generateTokenEndpoint, {}, {
+                        headers: __assign({}, CONFIG.HEADERS),
+                    })];
             case 1:
                 response = _a.sent();
                 if (response.status === 404) {

@@ -41,7 +41,11 @@ export const configure = (options: OPTIONS): void => {
  */
 export const generateToken = async (host: string, username: string, password: string): Promise<JWT> => {
     const generateTokenEndpoint = `${host}/${CONFIG.JWT_ENDPOINT}/${CONFIG.JWT_ROUTE_GENERATE}`;
-    const response = await axios.post(generateTokenEndpoint, { username, password });
+    const response = await axios.post(generateTokenEndpoint, { username, password }, {
+        headers: {
+            ...CONFIG.HEADERS,
+        },
+    });
     switch (response.status) {
         case 403: throw new Error('CannotAuthenticate: Bad username or password');
         case 404: throw new Error(`CannotAuthenticate: Page doesn\'t exists, make sure JWT is installed`);
@@ -58,8 +62,8 @@ export const generateToken = async (host: string, username: string, password: st
  */
 export const validateToken = async (host: string, token: string): Promise<boolean> => {
     const validateTokenEndpoint = `${host}/${CONFIG.JWT_ENDPOINT}/${CONFIG.JWT_ROUTE_VALIDATE}`;
-    const authHeader = { headers: { Authorization: 'bearer ' + token } };
-    const response = await axios.post(validateTokenEndpoint, {}, authHeader);
+    const headers = { headers: { Authorization: 'Bearer ' + token, ...CONFIG.HEADERS } };
+    const response = await axios.post(validateTokenEndpoint, {}, headers);
     if (response.status === 200) {
         return true;
     }
@@ -73,7 +77,11 @@ export const validateToken = async (host: string, token: string): Promise<boolea
  */
 export const connectToJwt = async (host: string) => {
     const generateTokenEndpoint = `${host}/${CONFIG.JWT_ENDPOINT}/${CONFIG.JWT_ROUTE_GENERATE}`;
-    const response = await axios.post(generateTokenEndpoint);
+    const response = await axios.post(generateTokenEndpoint, {}, {
+        headers: {
+            ...CONFIG.HEADERS,
+        },
+    });
     if (response.status === 404) {
         throw new Error('CannotConnect: bad host or JWT is not installed');
     }
